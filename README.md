@@ -69,6 +69,19 @@ The system will return a **Structured JSON** response grounded strictly in your 
 
 The system follows a modular RAG pipeline:
 
+### High-Level Data Flow
+```mermaid
+graph LR
+    A[Documents] -->|Ingestion| B(Chunking & OCR)
+    B -->|Embeddings| C[(Chroma Vector DB)]
+    B -->|Metadata| D[BM25 Index]
+    E[User Query] -->|Hybrid Search| F{Retriever}
+    F -->|Context| G[LLM Generation]
+    G -->|JSON| H[Structured Response]
+    C --> F
+    D --> F
+```
+
 ### 1. Ingestion (`src/ingestion.py`)
 - **Multi-modal Loading**:
   - `docx`, `pdf`, `txt`, `md`: Native text extraction.
@@ -83,6 +96,17 @@ The system follows a modular RAG pipeline:
 - **Hybrid Search**: Combines **Vector Search** (Semantic) + **BM25** (Keyword).
 - **Ensemble**: Weights results 50/50 to ensure both conceptual and exact matches are found.
 - **Result**: Returns top-k relevant chunks with metadata (Source File, Page Number).
+
+```mermaid
+flowchart TD
+    Q[User Query] --> V[Vector Search]
+    Q --> K[Keyword Search BM25]
+    V -->|Top K| R1[Ranked List A]
+    K -->|Top K| R2[Ranked List B]
+    R1 & R2 -->|Ensemble| F[Final Ranked Context]
+    F -->|Threshold Filter| G[Guardrail Check]
+    G -->|Valid Chunks| LLM[LLM Input]
+```
 
 ### 3. Generation (`src/generation.py`)
 - **Model**: `llama-3.3-70b-versatile` via Groq (Fast, high-performance).
