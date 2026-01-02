@@ -19,8 +19,8 @@ Built with **LangChain**, **Streamlit**, **ChromaDB**, and **Groq**.
 ### 2. Installation
 ```bash
 # Clone the repo
-git clone <your-repo-url>
-cd Sujal_Rag
+git clone (https://github.com/Sujal-py3/rag-context-grounded-engine)
+cd rag-context-grounded-engine
 
 # Install dependencies
 pip install -r requirements.txt
